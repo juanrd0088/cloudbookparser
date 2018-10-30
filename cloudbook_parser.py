@@ -144,11 +144,16 @@ def function_parser():
 			n = 1
 			last_value = 1
 			#level = 1
-			levels.append(level)
-			values.append(n)
+			levels = []
+			values = []
+			#levels.append(level)
+			#values.append(n)
+			levels.append(1)
+			values.append(1)
 			print(tok.value + " levels: "+str(levels) +" values: "+ str(values))
 			continue
-		if tok.lexpos > levels[-1]:#ignore indent 0
+		#if tok.lexpos > levels[-1]:#ignore indent 0
+		if tok.lexpos > 0:#ignore indent 0
 			if tok.type == 'INVOCATION' and tok.value in function_names:
 				index_invocator = function_names.index(invocator)+1
 				index_invoked = function_names.index(tok.value)+1
@@ -157,7 +162,7 @@ def function_parser():
 					#print("Llamada de valor 1")
 					n = int(1)
 				else:#more indent than one
-					n = values[tok.lexpos]
+					n = values[tok.lexpos-1]
 				matrix[index_invoked][index_invocator] += int(n)
 				print("La funcion: "+invocator+" invoca a "+ tok.value + " " + str(n) + " veces")
 				#last_value = n
@@ -168,6 +173,8 @@ def function_parser():
 				level_loop +=1
 				values.append(n)
 				loop_levels.append(tok.lexpos)
+				levels.append(tok.lexpos+1)
+				print("Bucle for, niveles: "+str(levels)+ "valores: "+ str(values))
 		if tok.lexpos == 0:#ignore indent 0
 			n=0
 			level = 0
