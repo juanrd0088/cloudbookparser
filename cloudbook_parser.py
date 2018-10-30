@@ -11,7 +11,7 @@ import math
 #file = "cloudbook_maker.py"
 file = "pruebas.py"
 
-tokens = ['FUN_DEF','COMMENT','LOOP_FOR','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION','INVOCATION','ANY_LINE']
+tokens = ['FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION','INVOCATION','ANY_LINE']
 
 #fundefintion =r'[\s]*[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
 fundefintion =r'[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
@@ -58,6 +58,12 @@ def t_LOOP_FOR(t):#very simple for, not evaluated targetlist
 		t.value = len(eval(t.value))#only this kind of iterator?
 	except:
 		t.value = 100
+	return t
+
+def t_LOOP_WHILE(t):
+	r'[w][h][i][l][e][\s]+[\d\D\s\S\w\W]*'
+	t.type = 'LOOP_WHILE'
+	t.value = 100
 	return t
 
 #def t_FUN_INVOCATION(t):
@@ -158,11 +164,12 @@ def function_parser():
 				index_invocator = function_names.index(invocator)+1
 				index_invoked = function_names.index(tok.value)+1
 				#before assign value to matrix compare value and indentation
-				if tok.lexpos-levels[-1] == 1:
-					#print("Llamada de valor 1")
-					n = int(1)
-				else:#more indent than one
-					n = values[tok.lexpos-1]
+				#if tok.lexpos-levels[-1] == 1:
+				#	print("Llamada de valor 1",tok.lexpos," y ", levels[-1])
+				#	n = int(1)
+				#else:#more indent than one
+				#	n = values[tok.lexpos-1]
+				n = values[tok.lexpos-1]
 				matrix[index_invoked][index_invocator] += int(n)
 				print("La funcion: "+invocator+" invoca a "+ tok.value + " " + str(n) + " veces")
 				#last_value = n
@@ -175,6 +182,11 @@ def function_parser():
 				loop_levels.append(tok.lexpos)
 				levels.append(tok.lexpos+1)
 				print("Bucle for, niveles: "+str(levels)+ "valores: "+ str(values))
+			if tok.type == 'LOOP_WHILE':
+				n = n * tok.value
+				values.append(n)
+				levels.append(tok.lexpos+1)
+				print("Bucle while, niveles: "+str(levels)+ "valores: "+ str(values))
 		if tok.lexpos == 0:#ignore indent 0
 			n=0
 			level = 0
@@ -210,4 +222,7 @@ function_names = function_scanner()
 print(function_names)
 function_parser()
 
+#toklist = tokenize()
+#for i in toklist:
+#	print(i)
 
