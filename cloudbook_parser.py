@@ -11,7 +11,7 @@ import math
 #file = "cloudbook_maker.py"
 file = "pruebas.py"
 
-tokens = ['FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION','INVOCATION','ANY_LINE']
+tokens = ['FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','IF','TRY','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION','INVOCATION','ANY_LINE']
 
 #fundefintion =r'[\s]*[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
 fundefintion =r'[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
@@ -64,6 +64,18 @@ def t_LOOP_WHILE(t):
 	r'[w][h][i][l][e][\s]+[\d\D\s\S\w\W]*'
 	t.type = 'LOOP_WHILE'
 	t.value = 100
+	return t
+
+def t_IF(t):
+	r'[i][f][\s]+[\d\D\s\S\w\W]+[:][\s]*[\n]'
+	t.type = 'IF'
+	t.value = 1
+	return t
+
+def t_TRY(t):
+	r'[t][r][y][\s]*[:][\s]*[\n]'
+	t.type = 'TRY'
+	t.value = 1
 	return t
 
 #def t_FUN_INVOCATION(t):
@@ -218,11 +230,11 @@ def print_matrix(matrix):
 		print (matrix[i])
 
 
-function_names = function_scanner()
-print(function_names)
-function_parser()
+#function_names = function_scanner()
+#print(function_names)
+#function_parser()
 
-#toklist = tokenize()
-#for i in toklist:
-#	print(i)
+toklist = tokenize()
+for i in toklist:
+	print(i)
 

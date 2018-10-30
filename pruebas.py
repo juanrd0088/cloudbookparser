@@ -15,8 +15,10 @@ def fun2	(cadena,num):
 			cosa()
 			for k in range(5):
 				main()
+				test()
 	funcion1()
 	hola()
+	main()
 
 def main():
 	fun2("hola",10)
@@ -29,13 +31,21 @@ def cosa( def adios():):
 		hola()
  
 def hola():
-	pass
-
-def cosa():
-	pass
+	if 	True:
+		print("adios")
+	try    	:
+		funcion1()
 
 def test():
+	while 	True:
+		main()
+		print("test")
+		for i in range(2):
+			funcion1()
+	main()
 	print("HOLA")
 	return "done"
 	return "redone"
+
+main()
 
