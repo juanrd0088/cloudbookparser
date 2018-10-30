@@ -133,7 +133,7 @@ def function_parser():
 	levels = []
 	values = []
 	loop_levels = []
-	levels.append(0)
+	#levels.append(0)
 	for tok in token_list:
 		if tok.type == 'FUN_DEF':#not for classes only procedimental programs
 			level = tok.lexpos
@@ -146,7 +146,7 @@ def function_parser():
 			#level = 1
 			levels.append(level)
 			values.append(n)
-			print("function def: "+str(levels) +" y "+ str(values))
+			print(tok.value + " levels: "+str(levels) +" values: "+ str(values))
 			continue
 		if tok.lexpos > levels[-1]:#ignore indent 0
 			if tok.type == 'INVOCATION' and tok.value in function_names:
