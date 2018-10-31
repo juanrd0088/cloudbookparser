@@ -1,4 +1,4 @@
-# cloudbookparser
+# Cloudbook Parser
 Source code for testing cloudbook parser
 In the file cloudbook parser, you should select the file that will be tested.
 Functionalities:
