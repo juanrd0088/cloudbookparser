@@ -6,12 +6,11 @@ import parser
 import token
 import math
 
+#file = "pruebas.py"
+file = "pruebas2.py"
 
-#file = "agent.py"
-#file = "cloudbook_maker.py"
-file = "pruebas.py"
-
-tokens = ['FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','IF','TRY','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION','INVOCATION','ANY_LINE']
+tokens = ['FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','IF','ELSE','TRY','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION',
+'INVOCATION','ANY_LINE']
 
 #fundefintion =r'[\s]*[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
 fundefintion =r'[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
@@ -69,6 +68,12 @@ def t_LOOP_WHILE(t):
 def t_IF(t):
 	r'[i][f][\s]+[\d\D\s\S\w\W]+[:][\s]*[\n]'
 	t.type = 'IF'
+	t.value = 1
+	return t
+
+def t_ELSE(t):
+	r'[e][l][s][e][\s]*[:][\s]*[\n]'
+	t.type = 'ELSE'
 	t.value = 1
 	return t
 
@@ -148,7 +153,7 @@ def function_parser():
 	n = 0
 	level_loop = 0
 	last_value = n
-	levels = []
+	levels = [] #list of levels of indentation, every token will append de level that is suppose to go after it
 	values = []
 	loop_levels = []
 	#levels.append(0)
@@ -176,12 +181,13 @@ def function_parser():
 				index_invocator = function_names.index(invocator)+1
 				index_invoked = function_names.index(tok.value)+1
 				#before assign value to matrix compare value and indentation
-				#if tok.lexpos-levels[-1] == 1:
-				#	print("Llamada de valor 1",tok.lexpos," y ", levels[-1])
-				#	n = int(1)
-				#else:#more indent than one
-				#	n = values[tok.lexpos-1]
-				n = values[tok.lexpos-1]
+				if tok.lexpos-levels[-1] == 1:#only if the invocation is the first thing in the function suite
+					print("Llamada de valor 1",tok.lexpos," y ", levels[-1])
+					n = int(1)
+				else:#more indent than one
+					print("llamada de valor n ",tok.lexpos)
+					n = values[tok.lexpos-1]
+				#n = values[tok.lexpos-1]
 				matrix[index_invoked][index_invocator] += int(n)
 				print("La funcion: "+invocator+" invoca a "+ tok.value + " " + str(n) + " veces")
 				#last_value = n
@@ -199,6 +205,10 @@ def function_parser():
 				values.append(n)
 				levels.append(tok.lexpos+1)
 				print("Bucle while, niveles: "+str(levels)+ "valores: "+ str(values))
+			if tok.type == 'IF':
+				n = tok.value
+				values.append(n)
+				levels.append(tok.lexpos+1)
 		if tok.lexpos == 0:#ignore indent 0
 			n=0
 			level = 0
@@ -230,11 +240,15 @@ def print_matrix(matrix):
 		print (matrix[i])
 
 
-#function_names = function_scanner()
-#print(function_names)
-#function_parser()
+def complete():
+	function_names = function_scanner()
+	print(function_names)
+	function_parser()
 
-toklist = tokenize()
-for i in toklist:
-	print(i)
+def onlytokens():
+	toklist = tokenize()
+	for i in toklist:
+		print(i)
 
+onlytokens()
+#complete()
