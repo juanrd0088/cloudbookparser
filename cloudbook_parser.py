@@ -8,6 +8,7 @@ import math
 
 #file = "pruebas.py"
 file = "pruebas2.py"
+#file = "pruebas3.py"
 
 tokens = ['FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','IF','ELSE','TRY','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION',
 'INVOCATION','ANY_LINE']
@@ -156,6 +157,9 @@ def function_parser():
 	levels = [] #list of levels of indentation, every token will append de level that is suppose to go after it
 	values = []
 	loop_levels = []
+	#values and levesl on indent 0
+	levels.append(0)
+	values.append(1)
 	#levels.append(0)
 	for tok in token_list:
 		if tok.type == 'FUN_DEF':#not for classes only procedimental programs
@@ -182,10 +186,10 @@ def function_parser():
 				index_invoked = function_names.index(tok.value)+1
 				#before assign value to matrix compare value and indentation
 				if tok.lexpos-levels[-1] == 1:#only if the invocation is the first thing in the function suite
-					print("Llamada de valor 1",tok.lexpos," y ", levels[-1])
+					print("Llamada de valor 1",tok.lexpos," y ", levels[-1], tok.lineno)
 					n = int(1)
 				else:#more indent than one
-					print("llamada de valor n ",tok.lexpos)
+					print("llamada de valor n ",tok.lexpos, tok.lineno)
 					n = values[tok.lexpos-1]
 				#n = values[tok.lexpos-1]
 				matrix[index_invoked][index_invocator] += int(n)
@@ -208,6 +212,10 @@ def function_parser():
 			if tok.type == 'IF':
 				n = tok.value
 				values.append(n)
+				levels.append(tok.lexpos+1)
+			if tok.type == 'ELSE':
+				n = 1
+				values[tok.lexpos] = n #check compatibility with for
 				levels.append(tok.lexpos+1)
 		if tok.lexpos == 0:#ignore indent 0
 			n=0
@@ -251,4 +259,4 @@ def onlytokens():
 		print(i)
 
 onlytokens()
-#complete()
+complete()
