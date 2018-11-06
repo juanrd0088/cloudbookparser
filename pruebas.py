@@ -16,6 +16,8 @@ def fun2	(cadena,num):
 			for k in range(5):
 				main()
 				test()
+	for i in range(t):
+		main()
 	funcion1()
 	hola()
 	main()

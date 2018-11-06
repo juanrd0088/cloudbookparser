@@ -148,18 +148,12 @@ def function_parser():
 	print(token_list)
 	function_names = function_scanner()
 	matrix = create_matrix(function_names)
-	#print_matrix(matrix)
 	invocator = ""
-	level = 0
-	n = 0
-	level_loop = 0
-	last_value = n
-	levels = [] #list of levels of indentation, every token will append de level that is suppose to go after it
 	values = []
-	loop_levels = []
-	#values and levesl on indent 0
-	levels.append(0)
-	values.append(1)
+	try:
+		values[0] = 1
+	except:
+		values.insert(0,1)
 	#levels.append(0)
 	for tok in token_list:
 		if tok.type == 'FUN_DEF':#not for classes only procedimental programs
@@ -169,15 +163,12 @@ def function_parser():
 			else:
 				invocator = tok.value
 			n = 1
-			last_value = 1
-			#level = 1
-			levels = []
-			values = []
-			#levels.append(level)
-			#values.append(n)
-			levels.append(1)
-			values.append(1)
-			print(tok.value + " levels: "+str(levels) +" values: "+ str(values))
+			#values.insert(tok.lexpos,n)
+			try:
+				values[tok.lexpos] = n
+			except:
+				values.insert(tok.lexpos,n)
+			print(tok.value  +" values: "+ str(values))
 			continue
 		#if tok.lexpos > levels[-1]:#ignore indent 0
 		if tok.lexpos > 0:#ignore indent 0
@@ -185,42 +176,57 @@ def function_parser():
 				index_invocator = function_names.index(invocator)+1
 				index_invoked = function_names.index(tok.value)+1
 				#before assign value to matrix compare value and indentation
-				if tok.lexpos-levels[-1] == 1:#only if the invocation is the first thing in the function suite
-					print("Llamada de valor 1",tok.lexpos," y ", levels[-1], tok.lineno)
-					n = int(1)
-				else:#more indent than one
-					print("llamada de valor n ",tok.lexpos, tok.lineno)
-					n = values[tok.lexpos-1]
-				#n = values[tok.lexpos-1]
+				#if tok.lexpos-levels[-1] == 1:#only if the invocation is the first thing in the function suite
+				#	print("Llamada de valor 1",tok.lexpos," y ", levels[-1], tok.lineno)
+				#	n = int(1)
+				#else:#more indent than one
+				#	print("llamada de valor n ",tok.lexpos, tok.lineno)
+				#	n = values[tok.lexpos-1]
+				n = values[tok.lexpos-1]
 				matrix[index_invoked][index_invocator] += int(n)
 				print("La funcion: "+invocator+" invoca a "+ tok.value + " " + str(n) + " veces")
 				#last_value = n
 			if tok.type == 'LOOP_FOR':
 				#level = tok.lexpos
-				n = n*tok.value
-				last_value = tok.value
-				level_loop +=1
-				values.append(n)
-				loop_levels.append(tok.lexpos)
-				levels.append(tok.lexpos+1)
-				print("Bucle for, niveles: "+str(levels)+ "valores: "+ str(values))
+				#n = n*tok.value
+				n = values[tok.lexpos-1]*tok.value
+				#values.insert(tok.lexpos,n)
+				try:
+					values[tok.lexpos] = n
+				except:
+					values.insert(tok.lexpos,n)
+				print("Bucle for, "+ "valores: "+ str(values))
 			if tok.type == 'LOOP_WHILE':
 				n = n * tok.value
-				values.append(n)
-				levels.append(tok.lexpos+1)
-				print("Bucle while, niveles: "+str(levels)+ "valores: "+ str(values))
+				#values.insert(tok.lexpos,n)
+				try:
+					values[tok.lexpos] = n
+				except:
+					values.insert(tok.lexpos,n)
+				print("Bucle while"+ "valores: "+ str(values))
 			if tok.type == 'IF':
 				n = tok.value
-				values.append(n)
-				levels.append(tok.lexpos+1)
+				#values.insert(tok.lexpos,n)
+				try:
+					values[tok.lexpos] = n
+				except:
+					values.insert(tok.lexpos,n)
 			if tok.type == 'ELSE':
 				n = 1
-				values[tok.lexpos] = n #check compatibility with for
-				levels.append(tok.lexpos+1)
+				#values.insert(tok.lexpos,n)
+				try:
+					values[tok.lexpos] = n
+				except:
+					values.insert(tok.lexpos,n)
 		if tok.lexpos == 0:#ignore indent 0
 			n=0
 			level = 0
-			levels.append(level)
+			#levels.append(level)
+			#values.insert(tok.lexpos,n)
+			try:
+				values[tok.lexpos] = n
+			except:
+				values.insert(tok.lexpos,n)
 	print_matrix(matrix)
 
 def parser():
