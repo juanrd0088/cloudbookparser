@@ -7,15 +7,19 @@ import token
 import math
 
 #file = "pruebas.py"
-file = "pruebas2.py"
-#file = "pruebas3.py"
+#file = "pruebas2.py"
+file = "pruebas3.py"
 
-tokens = ['FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','IF','ELSE','TRY','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION',
-'INVOCATION','ANY_LINE']
+tokens = ['IMPORT','FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','IF','ELSE','TRY','EXCEPT','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION',
+'INVOCATION','ASSIGNATION']
 
 #fundefintion =r'[\s]*[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
 fundefintion =r'[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
 t_ignore = " \n"
+opt = r'[i][m][p][o][r][t]|[f][r][o][m]'
+iden = r'[a-zA-Z_][a-zA-Z_0-9]*'
+importation = r'[i][m][p][o][r][t]'+r'[\s]+'+r'[a-zA-Z_][a-zA-Z_0-9]*'#+r'[\s]+'+r'[[a][s][\s]+[a-zA-Z_][a-zA-Z_0-9]*]*'
+fromimport = r'[f][r][o][m]'+r'[\s]'+iden+importation #Not implemented, how to save in database
 
 #functions = []
 #fun_invocations = []
@@ -27,13 +31,18 @@ def t_COMMENT(t):
 	r'\#.*'
 	pass
 
+@TOKEN(importation)
+def t_IMPORT(t):
+	t.type = 'IMPORT'
+	return t
+
 def t_PRINTV3(t):#TODO Probarlo mas.
-	r'[p][r][i][n][t][ ]*[(][\d\D\s\S\w\W]*'
+	r'[p][r][i][n][t][ ]*[(]["][@][\d\D\s\S\w\W]*'
 	t.type = 'PRINTV3'
 	return t
 
 def t_PRINTV2(t):#TODO Probarlo mas.
-	r'[p][r][i][n][t][ ][\d\D\s\S\w\W]*'
+	r'[p][r][i][n][t][ ]["][@][\d\D\s\S\w\W]*'
 	t.type = 'PRINTV2'
 	return t
 
@@ -84,6 +93,12 @@ def t_TRY(t):
 	t.value = 1
 	return t
 
+def t_EXCEPT(t):
+	r'[e][x][c][e][p][t][\s]*[:][\s]*[\n]'
+	t.type = 'EXCEPT'
+	t.value = 1
+	return t
+
 #def t_FUN_INVOCATION(t):
 def t_INVOCATION(t):
 	#r'[\s]*[a-zA-Z_][a-zA-Z_0-9]*[(][\d\D\s\S\w\W]*[)][\s]*[\n]*'
@@ -101,10 +116,12 @@ def t_INVOCATION(t):
 	t.type = 'INVOCATION'
 	return t
 
-#def t_ANY_LINE(t):
-#	r'[\d\D\s\S\w\W]+'
-#	t.type = 'ANY_LINE'
-#	return t
+def t_ASSIGNATION(t):
+	r'[a-zA-Z_][a-zA-Z_0-9]+[/s]*[=][/s]*'
+	t.type = 'ASSIGNATION'
+	#t.value removing tabs
+	t.value = re.sub(r'\s*',"",t.value)
+	return t
 
 def t_error(t):
     #print("Illegal characters!")
@@ -130,6 +147,12 @@ def tokenize():
 	            tok.lineno = i
 	            #print(tok)
 	            token_list.append(tok)
+	    #normalize token list
+	    #if there are several tokens in same line, the pos for everyone will be the minimum position
+	    for i,j in enumerate(token_list[:-1]):
+	    	if j.lineno == token_list[i+1].lineno:#the next token in the same line
+	    		token_list[i+1].lexpos = j.lexpos #get the first lexpos (the one to the left)
+
 
 	return token_list
 
@@ -182,6 +205,7 @@ def function_parser():
 				#else:#more indent than one
 				#	print("llamada de valor n ",tok.lexpos, tok.lineno)
 				#	n = values[tok.lexpos-1]
+				print(tok.lexpos-1)
 				n = values[tok.lexpos-1]
 				matrix[index_invoked][index_invocator] += int(n)
 				print("La funcion: "+invocator+" invoca a "+ tok.value + " " + str(n) + " veces")
@@ -218,11 +242,15 @@ def function_parser():
 					values[tok.lexpos] = n
 				except:
 					values.insert(tok.lexpos,n)
+			if tok.type == 'EXCEPT':
+				n = 1
+				#values.insert(tok.lexpos,n)
+				try:
+					values[tok.lexpos] = n
+				except:
+					values.insert(tok.lexpos,n)
 		if tok.lexpos == 0:#ignore indent 0
-			n=0
-			level = 0
-			#levels.append(level)
-			#values.insert(tok.lexpos,n)
+			n=1
 			try:
 				values[tok.lexpos] = n
 			except:
@@ -265,4 +293,4 @@ def onlytokens():
 		print(i)
 
 onlytokens()
-complete()
+#complete()

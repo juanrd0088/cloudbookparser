@@ -18,9 +18,11 @@ def funcion1():
 	return eso
 
 def funcion2():
-	while True:
+	try:
 		funcion1()
-	else:
+	except:
+		for i in range(r):
+			funcion2()
 		funcion3()
 
 def funcion3():
@@ -28,5 +30,8 @@ def funcion3():
 		funcion2()
 	else:
 		funcion1()
+
+def funcion4():
+	funcion3()
 
 
