@@ -8,3 +8,6 @@ Functionalities:
 
 The set of test files is named pruebasXX.py
 These files only serve to test, not execute because they contain errors, infinite loops and other problems
+nbody implementations added
+
+The cloudbook_parser2 is a temp file with the current development version of the code
