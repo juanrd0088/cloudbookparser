@@ -9,25 +9,24 @@ import math
 #file = "pruebas.py"
 #file = "pruebas2.py"
 #file = "pruebas3.py"
-file = "nbody.py"
+#file = "nbody.py"
+file = "nbody_orig.py"
 
-tokens = ['IMPORT','FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','IF','ELSE','TRY','EXCEPT','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION',
-'INVOCATION','ASSIGNATION','RETURN']
+tokens = ['TEST','IMPORT','FUN_DEF','COMMENT','LOOP_FOR','LOOP_WHILE','IF','ELSE','TRY','EXCEPT','PRINTV2', 'PRINTV3','FUN_INVOCATION','PYTHON_INVOCATION',
+'INVOCATION','ASSIGNATION','RETURN','IDEN','GLOBAL']
 
-#fundefintion =r'[\s]*[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
 fundefintion =r'[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*'
 funorglobal = r'[d][e][f][\s]*[a-zA-Z_][a-zA-Z_0-9]*[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*|[a-zA-Z_][a-zA-Z_0-9]*'
 t_ignore = " \n"
-opt = r'[i][m][p][o][r][t]|[f][r][o][m]'
 iden = r'[a-zA-Z_][a-zA-Z_0-9]*'
-importation = r'[i][m][p][o][r][t]'+r'[\s]+'+r'[a-zA-Z_][a-zA-Z_0-9]*'#+r'[\s]+'+r'[[a][s][\s]+[a-zA-Z_][a-zA-Z_0-9]*]*'
-fromimport = r'[f][r][o][m]'+r'[\s]'+iden+importation #Not implemented, how to save in database
-
-#functions = []
-#fun_invocations = []
-#token_list = []
+#importation =r'[i][m][p][o][r][t]'+r'[\s]+'+r'[a-zA-Z_][a-zA-Z_0-9]*'
+importation = r'[f][r][o][m][\s]+[a-zA-Z_][a-zA-Z_0-9]*[i][m][p][o][r][t][\s]+[a-zA-Z_][a-zA-Z_0-9]*|[i][m][p][o][r][t][\s]+[a-zA-Z_][a-zA-Z_0-9]*'
+importation = r'[f][r][o][m][\s]+[a-zA-Z_][a-zA-Z_0-9]*|[i][m][p][o][r][t][\s]+[a-zA-Z_][a-zA-Z_0-9]*'
 
 
+iden = r'[a-zA-Z_][.a-zA-Z_0-9]*'
+assignation = r'[\s]*[=][\s]*'
+global_var = r'^[a-zA-Z_][a-zA-Z_0-9]*|[g][l][o][b][a][l][\s]+[a-zA-Z_][a-zA-Z_0-9]*'
 
 def t_COMMENT(t):
 	r'\#.*'
@@ -122,17 +121,37 @@ def t_INVOCATION(t):
 	t.type = 'INVOCATION'
 	return t
 
+def t_RETURN(t):
+	r'[\s]*[r][e][t][u][r][n][\s]*[\d\D\s\S\w\W]*[\n]'
+	t.type = 'RETURN'
+	return t
+
+@TOKEN(assignation)
 def t_ASSIGNATION(t):
-	r'[a-zA-Z_][.a-zA-Z_0-9]*[\s]*[=][\s]*'
+	#r'[a-zA-Z_][.a-zA-Z_0-9]*[\s]*[=][\s]*'
 	t.type = 'ASSIGNATION'
 	#t.value removing tabs
 	t.value = re.sub(r'\s*',"",t.value)
 	return t
 
-def t_RETURN(t):
-	r'[\s]*[r][e][t][u][r][n][\s]*[\d\D\s\S\w\W]*[\n]'
-	t.type = 'RETURN'
+@TOKEN(global_var)
+def t_GLOBAL(t):
+	t.type='GLOBAL'
+	if 'global' in t.value:
+		t.value = t.value.replace('global','')
+		t.value = re.sub(r'\s*',"",t.value)
+	t.value = '_VAR_'+t.value
 	return t
+
+@TOKEN(iden)
+def t_IDEN(t):
+	t.type='IDEN'
+	return t
+
+'''@TOKEN(complex_iden)
+def t_TEST(t):
+	t.type='TEST'
+	return t'''
 
 def t_error(t):
     #print("Illegal characters!")
@@ -174,12 +193,15 @@ def function_scanner():
 	for i in token_list:
 		if i.type == 'FUN_DEF':
 			function_names.append(i.value.split("(")[0])#cutre
+		if i.type == 'GLOBAL':
+			if i.value not in function_names:
+				function_names.append(i.value)
 	return function_names
 
 def function_parser():
 	print("entro en el parser")
 	token_list = tokenize()
-	print(token_list)
+	#print(token_list)
 	function_names = function_scanner()
 	matrix = create_matrix(function_names)
 	invocator = ""
@@ -206,7 +228,7 @@ def function_parser():
 			continue
 		#if tok.lexpos > levels[-1]:#ignore indent 0
 		if tok.lexpos > 0:#ignore indent 0
-			if tok.type == 'INVOCATION' and tok.value in function_names:
+			if (tok.type == 'INVOCATION' or tok.type == 'GLOBAL') and tok.value in function_names:
 				print("Invocation", tok.value, tok.lineno)
 				index_invocator = function_names.index(invocator)+1
 				index_invoked = function_names.index(tok.value)+1
@@ -302,8 +324,9 @@ def complete():
 def onlytokens():
 	toklist = tokenize()
 	for i in toklist:
-		print(i)
+		if i.type=='GLOBAL':
+			print(i)
 
 
 onlytokens()
-#complete()
+complete()
