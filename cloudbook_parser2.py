@@ -59,6 +59,8 @@ def t_FUN_DEF(t):#decorators not observed
 	t.type = 'FUN_DEF'
 	t.value = t.value.split(" ")[1]
 	t.value = re.sub(r'\s*',"",t.value)
+	if t.value.find("(")!=-1:
+		t.value = t.value.split("(")[0]
 	return t
 
 def t_LOOP_FOR(t):#very simple for, not evaluated targetlist
@@ -324,7 +326,7 @@ def complete():
 def onlytokens():
 	toklist = tokenize()
 	for i in toklist:
-		if i.type=='GLOBAL':
+		if i.type=='FUN_DEF':
 			print(i)
 
 
