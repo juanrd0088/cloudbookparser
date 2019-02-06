@@ -19,11 +19,11 @@ fundefintion =r'[d][e][f][\s]*'+r'[a-zA-Z_][a-zA-Z_0-9]*'+r'[\s]*[(][\d\D\s\S\w\
 funorglobal = r'[d][e][f][\s]*[a-zA-Z_][a-zA-Z_0-9]*[\s]*[(][\d\D\s\S\w\W]*[)][\s]*[:][\n]*|[a-zA-Z_][a-zA-Z_0-9]*'
 t_ignore = " \n"
 iden = r'[a-zA-Z_][a-zA-Z_0-9]*'
-#importation =r'[i][m][p][o][r][t]'+r'[\s]+'+r'[a-zA-Z_][a-zA-Z_0-9]*'
-importation = r'[f][r][o][m][\s]+[a-zA-Z_][a-zA-Z_0-9]*[i][m][p][o][r][t][\s]+[a-zA-Z_][a-zA-Z_0-9]*|[i][m][p][o][r][t][\s]+[a-zA-Z_][a-zA-Z_0-9]*'
-importation = r'[f][r][o][m][\s]+[a-zA-Z_][a-zA-Z_0-9]*|[i][m][p][o][r][t][\s]+[a-zA-Z_][a-zA-Z_0-9]*'
 
 
+from_token = r'[f][r][o][m][\s]+[a-zA-Z_][a-zA-Z_0-9]*'
+import_token = r'[i][m][p][o][r][t][\s]+[a-zA-Z_][a-zA-Z_0-9]*'
+importation = from_token + r'[\s]+' + import_token + r'|' + import_token
 iden = r'[a-zA-Z_][.a-zA-Z_0-9]*'
 assignation = r'[\s]*[=][\s]*'
 global_var = r'^[a-zA-Z_][a-zA-Z_0-9]*|[g][l][o][b][a][l][\s]+[a-zA-Z_][a-zA-Z_0-9]*'
@@ -124,7 +124,7 @@ def t_INVOCATION(t):
 	return t
 
 def t_RETURN(t):
-	r'[\s]*[r][e][t][u][r][n][\s]*[\d\D\s\S\w\W]*[\n]'
+	r'[r][e][t][u][r][n][\s]*[\d\D\s\S\w\W]*[\n]'
 	t.type = 'RETURN'
 	return t
 
@@ -326,9 +326,10 @@ def complete():
 def onlytokens():
 	toklist = tokenize()
 	for i in toklist:
-		if i.type=='FUN_DEF':
+		if i.type=='IMPORT' or i.type == 'GLOBAL':
 			print(i)
+		#print(i)
 
 
 onlytokens()
-complete()
+#complete()
